@@ -32,7 +32,7 @@ func (r *MemoryTargetRepository) Save(target *domain.Target) error {
 func (r *MemoryTargetRepository) FindByID(id string) (*domain.Target, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	
+
 	val, exists := r.targets[id]
 
 	if !exists {
@@ -103,4 +103,12 @@ func NewMemoryResultRepository() *MemoryResultRepository {
 	return &MemoryResultRepository{
 		results: make(map[string][]*domain.Result),
 	}
+}
+
+func (r *MemoryResultRepository) Save(result *domain.Result) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.results[result.TargetID] = append(r.results[result.TargetID], result)
+	return nil
 }
