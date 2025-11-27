@@ -65,6 +65,18 @@ func (r *MemoryTargetRepository) Delete(id string) error {
 	return nil
 }
 
+func (r *MemoryTargetRepository) Update(target *domain.Target) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, exists := r.targets[target.ID]; !exists {
+		return fmt.Errorf("target with id: %s not found", target.ID)
+	}
+
+	r.targets[target.ID] = target
+	return nil
+}
+
 // ========== [ALERT] ==========
 
 type MemoryAlertRepository struct {
