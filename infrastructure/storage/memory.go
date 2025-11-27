@@ -22,16 +22,18 @@ func NewMemoryTargetRepository() *MemoryTargetRepository {
 
 func (r *MemoryTargetRepository) Save(target *domain.Target) error {
 	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	r.targets[target.ID] = target
-	r.mu.Unlock()
 
 	return nil
 }
 
 func (r *MemoryTargetRepository) FindByID(id string) (*domain.Target, error) {
 	r.mu.RLock()
+	defer r.mu.RUnlock()
+	
 	val, exists := r.targets[id]
-	r.mu.RUnlock()
 
 	if !exists {
 		return nil, fmt.Errorf("target with id: %s not found", id)
