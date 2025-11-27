@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"sync"
 	"fmt"
+	"sync"
 
 	"github.com/karoljaro/go-uptime-monitor/domain"
 )
@@ -40,6 +40,19 @@ func (r *MemoryTargetRepository) FindByID(id string) (*domain.Target, error) {
 	return val, nil
 }
 
+func (r *MemoryTargetRepository) GetAll() ([]*domain.Target, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	targets := make([]*domain.Target, 0, len(r.targets))
+
+	for _, target := range r.targets {
+		targets = append(targets, target)
+	}
+
+	return targets, nil
+}
+
 // ========== [ALERT] ==========
 
 type MemoryAlertRepository struct {
@@ -54,7 +67,6 @@ func NewMemoryAlertRepository() *MemoryAlertRepository {
 }
 
 // ========== [RESULT] ==========
-
 
 type MemoryResultRepository struct {
 	mu      sync.RWMutex
