@@ -2,6 +2,7 @@ package storage
 
 import (
 	"sync"
+	"fmt"
 
 	"github.com/karoljaro/go-uptime-monitor/domain"
 )
@@ -25,6 +26,18 @@ func (r *MemoryTargetRepository) Save(target *domain.Target) error {
 	r.mu.Unlock()
 
 	return nil
+}
+
+func (r *MemoryTargetRepository) FindByID(id string) (*domain.Target, error) {
+	r.mu.RLock()
+	val, exists := r.targets[id]
+	r.mu.RUnlock()
+
+	if !exists {
+		return nil, fmt.Errorf("target with id: %s not found", id)
+	}
+
+	return val, nil
 }
 
 // ========== [ALERT] ==========
