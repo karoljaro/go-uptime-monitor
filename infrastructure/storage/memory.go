@@ -53,6 +53,18 @@ func (r *MemoryTargetRepository) GetAll() ([]*domain.Target, error) {
 	return targets, nil
 }
 
+func (r *MemoryTargetRepository) Delete(id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, exists := r.targets[id]; !exists {
+		return fmt.Errorf("target with id: %s not found", id)
+	}
+
+	delete(r.targets, id)
+	return nil
+}
+
 // ========== [ALERT] ==========
 
 type MemoryAlertRepository struct {
