@@ -1,8 +1,9 @@
 package storage
 
 import (
-	"github.com/karoljaro/go-uptime-monitor/domain"
 	"sync"
+
+	"github.com/karoljaro/go-uptime-monitor/domain"
 )
 
 // ========== [TARGET] ==========
@@ -16,6 +17,14 @@ func NewMemoryTargetRepository() *MemoryTargetRepository {
 	return &MemoryTargetRepository{
 		targets: make(map[string]*domain.Target),
 	}
+}
+
+func (r *MemoryTargetRepository) Save(target *domain.Target) error {
+	r.mu.Lock()
+	r.targets[target.ID] = target
+	r.mu.Unlock()
+
+	return nil
 }
 
 // ========== [ALERT] ==========
