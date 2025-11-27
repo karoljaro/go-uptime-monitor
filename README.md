@@ -3,7 +3,7 @@
 > [!NOTE]
 > This project is an educational exercise – I'm learning Go while building a real-time uptime monitoring system.
 
-[![Go](https://img.shields.io/badge/Go-1.21-blue.svg)](https://golang.org/)
+[![Go](https://img.shields.io/badge/Go-1.25-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/yourusername/go-uptime-monitor)](https://github.com/yourusername/go-uptime-monitor/issues)
 [![GitHub stars](https://img.shields.io/github/stars/yourusername/go-uptime-monitor?style=social)](https://github.com/yourusername/go-uptime-monitor/stargazers)
