@@ -111,6 +111,25 @@ func (r *MemoryAlertRepository) FindByTargetID(targetID string) ([]*domain.Alert
 	return nil, fmt.Errorf("alerts with targetID: %s not found", targetID)
 }
 
+func (r  *MemoryAlertRepository) GetUnresolvedByTargetID(targetID string) ([]*domain.Alert, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	alerts := make([]*domain.Alert, 0, len(r.alerts[targetID]))
+
+	if len(r.alerts[targetID]) == 0 {
+		return nil, fmt.Errorf("alert with id: %s not exists", targetID)
+	}
+
+	for _, alert := range r.alerts[targetID] {
+		if !alert.IsResolved {
+			alerts = append(alerts, alert)
+		}
+	}
+
+	return alerts, nil
+}
+
 // ========== [RESULT] ==========
 
 type MemoryResultRepository struct {
