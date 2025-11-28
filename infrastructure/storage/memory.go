@@ -123,3 +123,16 @@ func (r *MemoryResultRepository) FindByTargetID(targetID string) ([]*domain.Resu
 		
 	return nil, fmt.Errorf("result with targetID: %s not found", targetID)
 }
+
+func (r *MemoryResultRepository) GetLastByTargetID(targetID string) (*domain.Result, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	val, exists := r.results[targetID]
+
+	if !exists || len(val) == 0 {
+		return nil, fmt.Errorf("last result with targetID %s not found", targetID)
+	}
+
+	return val[len(val)-1], nil
+}
