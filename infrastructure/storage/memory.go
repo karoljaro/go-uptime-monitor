@@ -92,6 +92,15 @@ func NewMemoryAlertRepository() *MemoryAlertRepository {
 	}
 }
 
+func (r *MemoryAlertRepository) Save(alert *domain.Alert) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.alerts[alert.TargetID] = append(r.alerts[alert.TargetID], alert)
+	return nil
+}
+
+
 // ========== [RESULT] ==========
 
 type MemoryResultRepository struct {
