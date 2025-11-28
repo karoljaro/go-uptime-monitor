@@ -100,6 +100,16 @@ func (r *MemoryAlertRepository) Save(alert *domain.Alert) error {
 	return nil
 }
 
+func (r *MemoryAlertRepository) FindByTargetID(targetID string) ([]*domain.Alert, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if val, exists := r.alerts[targetID]; exists {
+		return val, nil
+	}
+
+	return nil, fmt.Errorf("alerts with targetID: %s not found", targetID)
+}
 
 // ========== [RESULT] ==========
 
