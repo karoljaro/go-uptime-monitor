@@ -112,3 +112,14 @@ func (r *MemoryResultRepository) Save(result *domain.Result) error {
 	r.results[result.TargetID] = append(r.results[result.TargetID], result)
 	return nil
 }
+
+func (r *MemoryResultRepository) FindByTargetID(targetID string) ([]*domain.Result, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if val, exists := r.results[targetID]; exists {
+		return val, nil
+	} 
+		
+	return nil, fmt.Errorf("result with targetID: %s not found", targetID)
+}
