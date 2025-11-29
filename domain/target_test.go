@@ -28,6 +28,10 @@ func TestNewTarget(t *testing.T) {
 	if target.Interval != interval {
 		t.Errorf("expected interval %s, got %s", interval, target.Interval)
 	}
+
+	if target.IsActive == false {
+		t.Errorf("expected IsActive true, got false")
+	}
 }
 
 func TestIsValid(t *testing.T) {
@@ -48,7 +52,7 @@ func TestIsValid(t *testing.T) {
 	if target1.IsValid() == false {
 		t.Errorf("expected interval true got false for target1")
 	}
-	
+
 	if target2.IsValid() == true {
 		t.Errorf("expected interval false, got true for target2")
 	}
