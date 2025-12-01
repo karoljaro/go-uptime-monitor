@@ -96,3 +96,27 @@ func TestMemoryTargetRepository_GetAll(t *testing.T) {
 		t.Errorf("expected 3 targets, got %d", len(foundTargets))
 	}
 }
+
+func TestMemoryTargetRepository_Delete(t *testing.T) {
+	id := "1"
+	url := "https://example.com"
+	name := "My API"
+	interval := 30 * time.Second
+
+	repo := NewMemoryTargetRepository()
+	target := domain.NewTarget(id, url, name, interval)
+
+	repo.Save(target)
+
+	if found, _ := repo.GetAll(); len(found) == 0 {
+		t.Errorf("Target not added, fix it")
+	}
+
+	repo.Delete(target.ID)
+
+	_, err := repo.FindByID(target.ID)
+
+	if err == nil {
+		t.Error("expected error after delete, but found target")
+	}
+}
