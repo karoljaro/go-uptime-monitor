@@ -49,4 +49,17 @@ func TestMemoryTargetRepository_Save(t *testing.T) {
 
 }
 
+func TestMemoryTargetRepository_FindByID_NotFound(t *testing.T) {
+	id := "1"
+	repo := NewMemoryTargetRepository()
 
+	found, err := repo.FindByID(id)
+
+	if found != nil {
+		t.Errorf("expected nil, got %v", found)
+	}
+
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+}
