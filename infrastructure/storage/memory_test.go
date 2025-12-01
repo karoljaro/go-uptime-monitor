@@ -63,3 +63,36 @@ func TestMemoryTargetRepository_FindByID_NotFound(t *testing.T) {
 		t.Error("expected error, got nil")
 	}
 }
+
+func TestMemoryTargetRepository_GetAll(t *testing.T) {
+	repo := NewMemoryTargetRepository()
+
+	targets := []struct {
+		id   string
+		url  string
+		name string
+	}{
+		{"1", "http://example.com/1", "name-1"},
+		{"2", "http://example.com/2", "name-2"},
+		{"3", "http://example.com/3", "name-3"},
+	}
+
+	if arr, _ := repo.GetAll(); len(arr) > 0 {
+		t.Error("expected empty array")
+	}
+
+	for _, tgt := range targets {
+		target := domain.NewTarget(tgt.id, tgt.url, tgt.name, 30*time.Second)
+		repo.Save(target)
+	}
+
+	foundTargets, err := repo.GetAll()
+
+	if err != nil {
+		t.Error("expected nil, got error: %w", err)
+	}
+
+	if len(foundTargets) != 3 {
+		t.Errorf("expected 3 targets, got %d", len(foundTargets))
+	}
+}
