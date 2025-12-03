@@ -248,3 +248,43 @@ func TestMemoryResultRepository_FindByTargetID(t *testing.T) {
 		t.Error("expected error, got nil")
 	}
 }
+
+func TestMemoryResultRepository_GetLastByTargetID(t * testing.T) {
+	repo := NewMemoryResultRepository()
+
+	results := []struct {
+		id           string
+		targetID     string
+		status       string
+		statusCode   int
+		responseTime time.Duration
+	}{
+		{"1", "t-1", "OK", 200, 120 * time.Millisecond},
+		{"2", "t-2", "TIMEOUT", 504, 3 * time.Second},
+		{"3", "t-3", "NOT_FOUND", 404, 45 * time.Millisecond},
+	}
+
+	if arr, _ := repo.FindByTargetID("t-3"); len(arr) > 0 {
+		t.Error("expected empty array")
+	}
+
+	for _, rus := range results {
+		result := domain.NewResult(rus.id, rus.targetID, rus.status, rus.statusCode, rus.responseTime)
+		repo.Save(result)
+	}
+
+	found, err := repo.GetLastByTargetID("t-3")
+
+	if err != nil {
+		t.Errorf("expected result, got %v", err)
+	}
+
+	if found.ID != "3" {
+		t.Errorf("expected ID %s, got %s", "3", found.ID)
+	}
+
+	if found.TargetID != "t-3" {
+		t.Errorf("expected targetID %s, got %s", "t-3", found.TargetID)
+	}
+
+}
