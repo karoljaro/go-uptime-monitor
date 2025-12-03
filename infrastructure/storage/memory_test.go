@@ -207,3 +207,44 @@ func TestMemoryResultRepository_Save(t *testing.T) {
 		t.Errorf("expected time %s, got %s", responseTime, found.ResponseTime)
 	}
 }
+
+func TestMemoryResultRepository_FindByTargetID(t *testing.T) {
+	repo := NewMemoryResultRepository()
+
+	results := []struct {
+		id           string
+		targetID     string
+		status       string
+		statusCode   int
+		responseTime time.Duration
+	}{
+		{"1", "t-1", "OK", 200, 120 * time.Millisecond},
+		{"2", "t-2", "TIMEOUT", 504, 3 * time.Second},
+		{"3", "t-3", "NOT_FOUND", 404, 45 * time.Millisecond},
+		{"4", "t-3", "ERROR", 500, 830 * time.Millisecond},
+		{"5", "t-3", "OK", 200, 10 * time.Millisecond},
+	}
+
+	if arr, _ := repo.FindByTargetID("t-3"); len(arr) > 0 {
+		t.Error("expected empty array")
+	}
+
+	for _, rus := range results {
+		result := domain.NewResult(rus.id, rus.targetID, rus.status, rus.statusCode, rus.responseTime)
+		repo.Save(result)
+	}
+
+	foundResults, err := repo.FindByTargetID("t-3")
+
+	if err != nil {
+		t.Error("expected nil, got error: %w", err)
+	}
+
+	if len(foundResults) != 3 {
+		t.Errorf("expected 3 targets, got %d", len(foundResults))
+	}
+
+	if _, err := repo.FindByTargetID("nonExistent"); err == nil {
+		t.Error("expected error, got nil")
+	}
+}
