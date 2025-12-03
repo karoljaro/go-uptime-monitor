@@ -249,7 +249,7 @@ func TestMemoryResultRepository_FindByTargetID(t *testing.T) {
 	}
 }
 
-func TestMemoryResultRepository_GetLastByTargetID(t * testing.T) {
+func TestMemoryResultRepository_GetLastByTargetID(t *testing.T) {
 	repo := NewMemoryResultRepository()
 
 	results := []struct {
@@ -287,4 +287,47 @@ func TestMemoryResultRepository_GetLastByTargetID(t * testing.T) {
 		t.Errorf("expected targetID %s, got %s", "t-3", found.TargetID)
 	}
 
+}
+
+// ======================[Alert]======================
+
+func TestMemoryAlertRepository_Save(t *testing.T) {
+	id := "alert-1"
+	targetID := "target-1"
+	alertType := "Error"
+	message := "Internal Server Error"
+
+	repo := NewMemoryAlertRepository()
+	alert := domain.NewAlert(id, targetID, alertType, message)
+
+	err := repo.Save(alert)
+
+	if err != nil {
+		t.Errorf("expected no error, got %v", err)
+	}
+
+	foundAlerts, err := repo.FindByTargetID(targetID)
+
+	if err != nil {
+		t.Error("expected nil, got error: %w", err)
+	}
+
+	if len(foundAlerts) == 0 {
+		t.Fatal("expected at least one alert, got 0")
+	}
+
+	found := foundAlerts[0]
+
+	if found.ID != alert.ID {
+		t.Errorf("expected ID %s, got %s", alert.ID, found.ID)
+	}
+	if found.TargetID != alert.TargetID {
+		t.Errorf("expected TargetID %s, got %s", alert.TargetID, found.TargetID)
+	}
+	if found.Type != alert.Type {
+		t.Errorf("expected Type %s, got %s", alert.Type, found.Type)
+	}
+	if found.Message != alert.Message {
+		t.Errorf("expected Message %s, got %s", alert.Message, found.Message)
+	}
 }
