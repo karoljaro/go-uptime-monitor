@@ -133,7 +133,7 @@ func TestMemoryTargetRepository_Update(t *testing.T) {
 
 	repo := NewMemoryTargetRepository()
 	target := domain.NewTarget(id, url, name, interval)
-	
+
 	repo.Save(target)
 
 	if found, _ := repo.GetAll(); len(found) == 0 {
@@ -160,5 +160,50 @@ func TestMemoryTargetRepository_Update(t *testing.T) {
 
 	if found.Interval != interval2 {
 		t.Errorf("expected %d, got %d", interval2, found.Interval)
+	}
+}
+
+// ======================[RESULT]======================
+
+func TestMemoryResultRepository_Save(t *testing.T) {
+	id := "result-1"
+	targetID := "targetId-1"
+	statusCode := 500
+	status := "Internal Server Error"
+	responseTime := 15 * time.Millisecond
+
+	repo := NewMemoryResultRepository()
+	result := domain.NewResult(id, targetID, status, statusCode, responseTime)
+
+	err := repo.Save(result)
+
+	if err != nil {
+		t.Errorf("expected no error, got %v", err)
+	}
+
+	found, err := repo.GetLastByTargetID(result.TargetID)
+
+	if err != nil {
+		t.Errorf("expected to find target, got error: %v", err)
+	}
+
+	if found.ID != id {
+		t.Errorf("expected ID %s, got %s", id, found.ID)
+	}
+
+	if found.TargetID != targetID {
+		t.Errorf("expected targetID %s, got %s", targetID, found.TargetID)
+	}
+
+	if found.Status != status {
+		t.Errorf("expected status %s, got %s", status, found.Status)
+	}
+
+	if found.StatusCode != statusCode {
+		t.Errorf("expected ID %d, got %d", statusCode, found.StatusCode)
+	}
+
+	if found.ResponseTime != responseTime {
+		t.Errorf("expected time %s, got %s", responseTime, found.ResponseTime)
 	}
 }
