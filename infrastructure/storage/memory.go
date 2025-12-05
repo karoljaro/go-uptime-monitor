@@ -118,7 +118,7 @@ func (r  *MemoryAlertRepository) GetUnresolvedByTargetID(targetID string) ([]*do
 	alerts := make([]*domain.Alert, 0, len(r.alerts[targetID]))
 
 	if len(r.alerts[targetID]) == 0 {
-		return nil, fmt.Errorf("alert with id: %s not exists", targetID)
+		return alerts, nil
 	}
 
 	for _, alert := range r.alerts[targetID] {
