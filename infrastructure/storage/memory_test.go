@@ -417,7 +417,7 @@ func TestMemoryAlertGetUnresolvedByTargetID(t *testing.T) {
 	repo.Update(findByIdAlert[1])
 
 	unresolved, err := repo.GetUnresolvedByTargetID("target-1")
-	
+
 	if err != nil {
 		t.Errorf("expected nil, got %v", err)
 	}
@@ -426,4 +426,43 @@ func TestMemoryAlertGetUnresolvedByTargetID(t *testing.T) {
 		t.Errorf("expected 2, got %d", len(unresolved))
 	}
 
+}
+
+func TestMemoryAlertUpdate(t *testing.T) {
+	id := "alert-1"
+	targetID := "target-1"
+	alertType := "Error"
+	message := "Internal Server Error"
+
+	alertType2 := "Warn"
+	message2 := "Origin not set"
+
+	repo := NewMemoryAlertRepository()
+	alert := domain.NewAlert(id, targetID, alertType, message)
+
+	repo.Save(alert)
+
+	updatedAlert := domain.NewAlert(id, targetID, alertType2, message2)
+
+	err := repo.Update(updatedAlert)
+
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+
+	foundTargets, err := repo.FindByTargetID(targetID)
+
+	found := foundTargets[0]
+
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+
+	if found.Type != alertType2 {
+		t.Errorf("expected %s, got %s", alertType2, found.Type)
+	}
+
+	if found.Message != message2 {
+		t.Errorf("expected %s, got %s", message2, found.Message)
+	}
 }
