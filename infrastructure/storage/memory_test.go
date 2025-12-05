@@ -93,7 +93,7 @@ func TestMemoryTargetRepository_GetAll(t *testing.T) {
 	}
 
 	if len(foundTargets) != 3 {
-		t.Errorf("expected 3 targets, got %d", len(foundTargets))
+		t.Errorf("expect, erred 3 targets, got %d", len(foundTargets))
 	}
 }
 
@@ -371,4 +371,59 @@ func TestMemoryAlertRepository_FindByTargetID(t *testing.T) {
 	if _, err := repo.FindByTargetID("nonExistent"); err == nil {
 		t.Error("expected error, got nil")
 	}
+}
+
+func TestMemoryAlertGetUnresolvedByTargetID(t *testing.T) {
+	repo := NewMemoryAlertRepository()
+
+	alerts := []struct {
+		id        string
+		targetID  string
+		alertType string
+		message   string
+	}{
+		{"alert-1", "target-1", "Error", "Internal Server Error"},
+		{"alert-2", "target-1", "Warning", "High memory usage"},
+		{"alert-3", "target-1", "Info", "Service started"},
+		{"alert-4", "target-1", "Error", "Database connection failed"},
+	}
+
+	for _, ars := range alerts {
+		alert := domain.NewAlert(ars.id, ars.targetID, ars.alertType, ars.message)
+		repo.Save(alert)
+	}
+
+	found, err := repo.GetUnresolvedByTargetID("target-1")
+
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+
+	if len(found) != 4 {
+		t.Errorf("expected array length 4, got %d", len(found))
+	}
+
+	nonExist, _ := repo.GetUnresolvedByTargetID("nonExist")
+
+	if len(nonExist) > 0 {
+		t.Errorf("expected empty array, got length %d", len(nonExist))
+	}
+
+	findByIdAlert, _ := repo.FindByTargetID("target-1")
+
+	findByIdAlert[0].Resolve()
+	repo.Update(findByIdAlert[0])
+	findByIdAlert[1].Resolve()
+	repo.Update(findByIdAlert[1])
+
+	unresolved, err := repo.GetUnresolvedByTargetID("target-1")
+	
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+
+	if len(unresolved) != 2 {
+		t.Errorf("expected 2, got %d", len(unresolved))
+	}
+
 }
