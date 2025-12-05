@@ -331,3 +331,44 @@ func TestMemoryAlertRepository_Save(t *testing.T) {
 		t.Errorf("expected Message %s, got %s", alert.Message, found.Message)
 	}
 }
+
+func TestMemoryAlertRepository_FindByTargetID(t *testing.T) {
+	repo := NewMemoryAlertRepository()
+
+	alerts := []struct {
+		id        string
+		targetID  string
+		alertType string
+		message   string
+	}{
+		{"alert-1", "target-1", "Error", "Internal Server Error"},
+		{"alert-2", "target-1", "Warning", "High memory usage"},
+		{"alert-3", "target-2", "Info", "Service started"},
+		{"alert-4", "target-3", "Error", "Database connection failed"},
+	}
+
+	for _, ars := range alerts {
+		alert := domain.NewAlert(ars.id, ars.targetID, ars.alertType, ars.message)
+		repo.Save(alert)
+	}
+
+	foundAlerts, err := repo.FindByTargetID("target-3")
+
+	if err != nil {
+		t.Errorf("expected alert, got %v", err)
+	}
+
+	found := foundAlerts[0]
+
+	if found.ID != "alert-4" {
+		t.Errorf("expected ID 'alert-4', got %s", found.ID)
+	}
+
+	if found.TargetID != "target-3" {
+		t.Errorf("expected TargetID 'target-3', got %s", found.TargetID)
+	}
+
+	if _, err := repo.FindByTargetID("nonExistent"); err == nil {
+		t.Error("expected error, got nil")
+	}
+}
